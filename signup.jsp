@@ -10,7 +10,8 @@
     <link rel="icon" href="static/images/tdf_logo.ico">
 
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/css/bootstrap.min.css">
-
+    
+    <link rel="stylesheet" href="static/css/form.css">
     <script src="https://www.google.com/recaptcha/api.js" async defer></script>
 </head>
 <body>
@@ -20,11 +21,11 @@
         
         <!-- ############################### -- Page Body -- ###################################-->
         <div class="row mb-5" style="margin-bottom: 100px;">
-            <!-- <div class="col-1"></div> -->
+            <div class="col-1"></div>
             <div class="col-md-10">
                 <h3 class="text-primary my-3 text-center py-3 bg-light" >Sign-Up</h3>
 
-                <form action="signup.do" method="post" class="w-50 m-auto p-5 border rounded needs-validation" style="background-color:#ddd;" novalidate>
+                <form action="signup.do" method="post" class="w-50 m-auto p-5 border rounded needs-validation form_style" style="background-color:#ddd;" novalidate>
                     <div class="mb-3">
                         <label class="form-label" for="nm">Name</label>
                         <input class="form-control" id="nm" type="text" name="name">
@@ -54,7 +55,7 @@
                     <div class="mb-3">
                         <label class="form-label" for="phn">Phone number</label>
                         <input class="form-control" type="number" name="phone" id="phn" required>
-                        <div class="invalid-feedback">Enter correct phone number</div>
+                        <div class="invalid-feedback">Please enter a valid phone number</div>
                     </div>
 
                     <div class="g-recaptcha mb-3" data-sitekey="6Lc5sSopAAAAAEoDTF_P9Pu1h3vt1IwrONV73YSm"></div>
@@ -72,49 +73,71 @@
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/js/bootstrap.bundle.min.js"></script>
 
     <script>
-        let email = document.querySelector('#eml');
-        let phone = document.querySelector('#phn');
-        
         //------------ PHONE ----------------------
+        let phone = document.querySelector('#phn');
+        let contactPattern = /^[6-9][0-9]{9}$/;
+        
         let checkPhoneExists = async (phone)=>{
             console.log(phone);
             let response = await fetch('check_phone_exists.do?phone='+phone);
             let result = await response.text();
             return result;
         }
+        phone.addEventListener('focus',()=>{
+            phone.classList.remove('is-invalid');
+            phone.classList.remove('is-valid');
+        });
 
         phone.addEventListener('blur',()=>{
-            checkPhoneExists(phone.value).then((data)=>{
-                console.log(data);
-                if(data=='true'){
-                    phone.classList.add('is-invalid');
-                }else{
-                    phone.classList.add('is-valid');
-                }
-            }).catch((error)=>{
-                console.log(error);
-            });
+            if(contactPattern.test(phone.value)){
+
+                checkPhoneExists(phone.value).then((data)=>{
+                    console.log(data);
+                    if(data=='true'){
+                        phone.classList.add('is-invalid');
+                    }else{
+                        phone.classList.add('is-valid');
+                    }
+                }).catch((error)=>{
+                    console.log(error);
+                });
+            }else{
+                phone.classList.add('is-invalid');
+            }
         });
         //------------ PHONE ----------------------
-
+        
         //------------ EMAIL ----------------------
+        let email = document.querySelector('#eml');
+        let emailPattern = /^\w+@[a-zA-Z_]+?\.[a-zA-Z]{2,3}$/;
+
+        
         let checkEmailExists = async (email) => {
             <!-- console.log("This is the email value "+ email); -->
             let response = await fetch('check_email_exists.do?email='+email);
             let result = await response.text();
             return result;
         }
+        email.addEventListener('focus',()=>{
+            email.classList.remove('is-invalid');
+            email.classList.remove('is-valid');
+        });
         email.addEventListener('blur', ()=>{
-            checkEmailExists(email.value).then((data)=>{
-                console.log(data);
-                if(data == 'true'){
-                    email.classList.add('is-invalid');
-                }else{
-                    email.classList.add('is-valid');
-                }
-            }).catch((error)=>{
-                console.log(error);
-            });
+            if(emailPattern.test(email.value)){
+                checkEmailExists(email.value).then((data)=>{
+                    console.log(data);
+                    if(data == 'true'){
+                        email.classList.add('is-invalid');
+                    }else{
+                        email.classList.add('is-valid');
+                    }
+                }).catch((error)=>{
+                    console.log(error);
+                });
+            }else{
+                email.classList.add('is-invalid');
+            }
+            
         });
         //------------ EMAIL ----------------------
 
