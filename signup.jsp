@@ -54,7 +54,7 @@
                     <div class="mb-3">
                         <label class="form-label" for="phn">Phone number</label>
                         <input class="form-control" type="number" name="phone" id="phn" required>
-                        <div class="invalid-feedback">Enter Phone Without Country Code</div>
+                        <div class="invalid-feedback">Enter correct phone number</div>
                     </div>
 
                     <div class="g-recaptcha mb-3" data-sitekey="6Lc5sSopAAAAAEoDTF_P9Pu1h3vt1IwrONV73YSm"></div>
@@ -73,7 +73,31 @@
 
     <script>
         let email = document.querySelector('#eml');
+        let phone = document.querySelector('#phn');
+        
+        //------------ PHONE ----------------------
+        let checkPhoneExists = async (phone)=>{
+            console.log(phone);
+            let response = await fetch('check_phone_exists.do?phone='+phone);
+            let result = await response.text();
+            return result;
+        }
 
+        phone.addEventListener('blur',()=>{
+            checkPhoneExists(phone.value).then((data)=>{
+                console.log(data);
+                if(data=='true'){
+                    phone.classList.add('is-invalid');
+                }else{
+                    phone.classList.add('is-valid');
+                }
+            }).catch((error)=>{
+                console.log(error);
+            });
+        });
+        //------------ PHONE ----------------------
+
+        //------------ EMAIL ----------------------
         let checkEmailExists = async (email) => {
             <!-- console.log("This is the email value "+ email); -->
             let response = await fetch('check_email_exists.do?email='+email);
@@ -92,6 +116,8 @@
                 console.log(error);
             });
         });
+        //------------ EMAIL ----------------------
+
         (()=>{
             'use strict'
 

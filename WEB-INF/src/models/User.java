@@ -51,6 +51,26 @@ public class User {
     }
 
     // ########### Other Methods ##############
+    public static boolean checkPhoneExists(String phone){
+        boolean flag = false;
+        try{
+            Class.forName("com.mysql.cj.jdbc.Driver");
+            Connection con = DriverManager.getConnection("jdbc:mysql://localhost:3306/mytdf?user=root&password=1234");
+            String query = "select user_id from users where phone=?";
+            PreparedStatement ps = con.prepareStatement(query);
+            ps.setString(1,phone);
+            ResultSet rs = ps.executeQuery();
+
+            while(rs.next()){
+                flag = true;
+            }
+            con.close();
+        }catch(SQLException|ClassNotFoundException e){
+            e.printStackTrace();
+        }
+        return flag;
+    }
+
     public static boolean checkEmailExists(String email){
         boolean flag=false;
         try{
