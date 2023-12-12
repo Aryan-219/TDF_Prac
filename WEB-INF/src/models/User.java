@@ -51,66 +51,74 @@ public class User {
     }
 
     // ########### Other Methods ##############
-    public static boolean checkPhoneExists(String phone){
-        boolean flag = false;
-        try{
-            Class.forName("com.mysql.cj.jdbc.Driver");
-            Connection con = DriverManager.getConnection("jdbc:mysql://localhost:3306/mytdf?user=root&password=1234");
-            String query = "select user_id from users where phone=?";
-            PreparedStatement ps = con.prepareStatement(query);
-            ps.setString(1,phone);
-            ResultSet rs = ps.executeQuery();
-
-            while(rs.next()){
-                flag = true;
-            }
-            con.close();
-        }catch(SQLException|ClassNotFoundException e){
-            e.printStackTrace();
-        }
-        return flag;
-    }
-
-    public static boolean checkEmailExists(String email){
-        boolean flag=false;
-        try{
-            Class.forName("com.mysql.cj.jdbc.Driver");
-            Connection con = DriverManager.getConnection("jdbc:mysql://localhost:3306/mytdf?user=root&password=1234");
-            String query = "select  user_id from users where email=?";
-            PreparedStatement ps = con.prepareStatement(query);
-            ps.setString(1,email);
-            ResultSet rs = ps.executeQuery();
-            if(rs.next()){
-                flag=true;
-            }
-            con.close();
-        }catch(ClassNotFoundException | SQLException e){
-            e.printStackTrace();
-        }
-        return flag;
-    }
-
-    public static boolean verifyEmail(String email, String otp) {
+    public static boolean checkPhoneExists(String phone) {
         boolean flag = false;
         try {
             Class.forName("com.mysql.cj.jdbc.Driver");
             Connection con = DriverManager.getConnection("jdbc:mysql://localhost:3306/mytdf?user=root&password=1234");
-            String query = "update users set status_id=1,otp='' where email=? and otp=?";
+            String query = "select user_id from users where phone=?";
+            PreparedStatement ps = con.prepareStatement(query);
+            ps.setString(1, phone);
+            ResultSet rs = ps.executeQuery();
+
+            while (rs.next()) {
+                flag = true;
+            }
+            con.close();
+        } catch (SQLException | ClassNotFoundException e) {
+            e.printStackTrace();
+        }
+        return flag;
+    }
+
+    public static boolean checkEmailExists(String email) {
+        boolean flag = false;
+        try {
+            Class.forName("com.mysql.cj.jdbc.Driver");
+            Connection con = DriverManager.getConnection("jdbc:mysql://localhost:3306/mytdf?user=root&password=1234");
+            String query = "select  user_id from users where email=?";
             PreparedStatement ps = con.prepareStatement(query);
             ps.setString(1, email);
-            ps.setString(2, otp);
-
-            int x = ps.executeUpdate();
-            System.out.println(x);
-            if (x == 1) {
+            ResultSet rs = ps.executeQuery();
+            if (rs.next()) {
+                System.out.println("Duplicate entry found");
                 flag = true;
             }
             con.close();
         } catch (ClassNotFoundException | SQLException e) {
             e.printStackTrace();
         }
-        System.out.println(flag + "1");
         return flag;
+    }
+
+    public static int verifyEmail(String email, String otp) {
+        int x = -1;
+        try {
+            Class.forName("com.mysql.cj.jdbc.Driver");
+            Connection con = DriverManager.getConnection("jdbc:mysql://localhost:3306/mytdf?user=root&password=1234");
+
+            String query = "update users set status_id=1,otp='' where email=? and otp=? and status_id!=1";
+
+            PreparedStatement ps = con.prepareStatement(query);
+            ps.setString(1, email);
+            ps.setString(2, otp);
+
+            int res = ps.executeUpdate();
+            System.out.println("Result of the update query" + res);
+            if (res == 1) {
+                System.out.println("email verification successful");
+                System.out.println("Updating flag value to true");
+                x = 1;
+            }else{
+                x = 0;
+                System.out.println("You are already verified");
+            }
+            
+            con.close();
+        } catch (ClassNotFoundException | SQLException e) {
+            e.printStackTrace();
+        }
+        return x;
     }
 
     public boolean signupUser() {

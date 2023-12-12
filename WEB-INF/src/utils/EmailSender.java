@@ -36,7 +36,7 @@ public class EmailSender {
         } catch (MessagingException e) {
             e.printStackTrace();
         }
-
+        System.out.println("Email has been sent successfully");
     }
 
     public static void sendAccVerificationEmail(String email,String otp){

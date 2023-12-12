@@ -33,9 +33,9 @@
                         <div class="invalid-feedback">Please Enter Your Full Name</div>
                     </div>
                     <div class="mb-3">
-                        <label class="form-label" for="eml">Email</label>
-                        <input class="form-control" type="text" name="email" id="eml" pattern="^/w+@[a-zA-Z]+?\.[a-zA-Z]{2,3}$">
-                        <div class="invalid-feedback">Please enter valid Email</div>
+                        <label for="email" class="form-label">Email</label>
+                        <input type="text" class="form-control" id="email" name="email">
+                        <div class="invalid-feedback" id="email_error_feedback">Please Enter Valid Email</div>
                     </div>
                     <div class="mb-3">
                         <label for="pwd" class="form-label">Password</label>
@@ -57,7 +57,14 @@
                         <input class="form-control" type="number" name="phone" id="phn" required>
                         <div class="invalid-feedback">Please enter a valid phone number</div>
                     </div>
-
+                    <div class="mb-3">
+                        <input type="button" class="d-block btn btn-outline-secondary" value="Send OTP" id="btn">
+                    </div>
+                    <div class="mb-3 otpbox d-none" >
+                        <label for="otpfield" class="form-label">Enter the otp sent to your mobile number</label>
+                        <input type="number"  id="otpfield" class="check-otp-box form-control ">
+                        <input type="button" value="Check OTP" class="btn btn-outline-secondary mt-3" id="checkotpbutton">
+                    </div>
                     <div class="g-recaptcha mb-3" data-sitekey="6Lc5sSopAAAAAEoDTF_P9Pu1h3vt1IwrONV73YSm"></div>
 
                     <input type="submit" value="SignUp" class="btn btn-primary mb-3">
@@ -84,6 +91,7 @@
             return result;
         }
         phone.addEventListener('focus',()=>{
+            
             phone.classList.remove('is-invalid');
             phone.classList.remove('is-valid');
         });
@@ -107,40 +115,96 @@
         });
         //------------ PHONE ----------------------
         
-        //------------ EMAIL ----------------------
-        let email = document.querySelector('#eml');
-        let emailPattern = /^\w+@[a-zA-Z_]+?\.[a-zA-Z]{2,3}$/;
+        //------------ OTP ----------------------
+        let checkotpbutton = document.querySelector('#checkotpbutton');
+        let send_otp = document.querySelector('#btn');
+        let otpbox = document.querySelector('.otpbox');
+        let otpfield = document.querySelector('#otpfield');
 
-        
-        let checkEmailExists = async (email) => {
-            <!-- console.log("This is the email value "+ email); -->
-            let response = await fetch('check_email_exists.do?email='+email);
+        let generateOTP = async (phone)=>{
+            console.log("entered phone no. is:"+phone);
+            let response = await fetch('generate_otp.do?phone='+phone);
             let result = await response.text();
             return result;
         }
-        email.addEventListener('focus',()=>{
+        send_otp.addEventListener('click',()=>{
+            generateOTP(phone.value).then((data)=>{
+                if(data == 'true'){
+                    otpbox.classList.replace('d-none','d-block');
+                    send_otp.classList.replace('d-block','d-none');
+                }
+            }).catch((error)=>{
+                console.log(error);
+            });
+        });
+
+
+        let checkOTP = async (otp)=>{
+            console.log(otp);
+            let response = await fetch('check_otp.do?otp='+otp);
+            let result = await response.text();
+            return result;
+        };
+        checkotpbutton.addEventListener('click',()=>{
+            checkOTP(otpfield.value).then((data)=>{
+                if(data == 'true'){
+                    otpbox.classList.replace('d-block','d-none');
+
+                    console.log("OTP verified");
+                    phone.readOnly= true;
+                    isVerified = true;
+                }else{
+                    console.log("Incorrect OTP");
+                }
+            }).catch((error)=>{
+                console.log(error)
+            });
+        });
+
+        //------------ EMAIL ----------------------
+        let email = document.querySelector('#email');  
+        let email_error_feedback = document.querySelector('#email_error_feedback'); 
+        let emailDuplicateTest = false; 
+
+        let emailPattern = /^\w+@[a-zA-Z_]+?\.[a-zA-Z]{2,3}$/;
+        
+        let checkEmailExists = async (email) => {
+            console.log('Entered value of email is: ' + email);
+            let response = await fetch('check_email_exists.do?email=' + email);
+            let result = await response.text();
+
+            return result;
+        };
+
+        email.addEventListener('focus', () => {
+            emailDuplicateTest = false;
             email.classList.remove('is-invalid');
             email.classList.remove('is-valid');
+            email_error_feedback.innerText = 'Please Enter Valid Email';
         });
-        email.addEventListener('blur', ()=>{
-            if(emailPattern.test(email.value)){
-                checkEmailExists(email.value).then((data)=>{
+
+        email.addEventListener('blur', (event) => {
+            if(emailPattern.test(event.target.value)) {
+                checkEmailExists(event.target.value).then((data)=>{
                     console.log(data);
-                    if(data == 'true'){
+                    if(data=='true'){
+                        emailDuplicateTest = true;
                         email.classList.add('is-invalid');
-                    }else{
+                       //email.classList.add('invalid');
+                        email_error_feedback.innerText = 'Email Already Exists...';
+                    } else {
                         email.classList.add('is-valid');
-                    }
+                    }    
                 }).catch((error)=>{
                     console.log(error);
                 });
-            }else{
+            } else {
                 email.classList.add('is-invalid');
+                email_error_feedback.innerText = 'Email Pattern Mismatch';
             }
-            
         });
         //------------ EMAIL ----------------------
-
+        
         (()=>{
             'use strict'
 
@@ -150,9 +214,9 @@
             //Loop over them and prevent submission
             Array.from(forms).forEach(form => {
                 form.addEventListener('submit',event => {
-                    if(!form.checkValidity()){
-                        event.preventDefault()
-                        event.stopPropogation()
+                    if(!form.checkValidity() || emailDuplicateTest){
+                        event.preventDefault();
+                        event.stopPropagation();
                     }
 
                     form.classList.add('was-validated')

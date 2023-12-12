@@ -45,7 +45,7 @@ public class SignupServlet extends HttpServlet{
             String phone = request.getParameter("phone");
 
             String otp = AppUtility.generateOTP();
-            System.out.println(otp);
+            System.out.println("Saving otp at the db for future email verification"+otp);
             User user = new User(name,email, password, phone, new Country(countryId),otp);
 
             if(user.signupUser()){
