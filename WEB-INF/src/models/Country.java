@@ -1,27 +1,23 @@
 package models;
 
-import java.sql.Connection;
-import java.sql.DriverManager;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
 import java.util.ArrayList;
 
-public class Country {
+import javax.servlet.ServletContext;
 
-    // ####################Properties #####################
+import java.sql.*;
+
+public class Country {
+    // ################ Properties ###################
+    public static ServletContext appContext;
+    public static String conURL;
+
     private Integer countryId;
     private String name;
     private Integer isdCode;
 
-    // #################### Constructors ################
-
+    // ################ Constructors ###################
     public Country() {
 
-    }
-
-    public Country(Integer countryId) {
-        this.countryId = countryId;
     }
 
     public Country(Integer countryId, String name) {
@@ -35,22 +31,27 @@ public class Country {
         this.isdCode = isdCode;
     }
 
-    // ################# Other Methods ##################
+    public Country(Integer countryId) {
+        this.countryId = countryId;
+    }
+
+    // ################ Other Methods ###################
     public static ArrayList<Country> collectAllCountries() {
         ArrayList<Country> countries = new ArrayList<>();
 
         try {
             Class.forName("com.mysql.cj.jdbc.Driver");
-            Connection con = DriverManager.getConnection("jdbc:mysql://localhost:3306/mytdf?user=root&password=1234");
+            Connection con = DriverManager.getConnection(conURL);
 
             String query = "select * from countries";
             PreparedStatement ps = con.prepareStatement(query);
-            
+
             ResultSet rs = ps.executeQuery();
-            
+
             while (rs.next()) {
                 countries.add(new Country(rs.getInt(1), rs.getString(2), rs.getInt(3)));
             }
+
             con.close();
         } catch (SQLException | ClassNotFoundException e) {
             e.printStackTrace();
@@ -59,8 +60,7 @@ public class Country {
         return countries;
     }
 
-    // ################## Getters- Setters ###############
-
+    // ################ Getter-Setters ###################
     public Integer getCountryId() {
         return countryId;
     }
@@ -84,4 +84,5 @@ public class Country {
     public void setIsdCode(Integer isdCode) {
         this.isdCode = isdCode;
     }
+
 }

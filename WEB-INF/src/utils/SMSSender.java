@@ -2,20 +2,20 @@ package utils;
 
 import com.twilio.Twilio;
 import com.twilio.rest.api.v2010.account.Message;
+import com.twilio.type.PhoneNumber;
 
 public class SMSSender {
-    public static String AUTH_TOKEN = "bf8c1256489a8e6021a84b6ac85f8126";
-    public static String ACCOUNT_SID = "AC9bb7ff9cf5faf0e638c5ee6f8ab761b8";
-    public static void sendSMS(String phone , String otp){
+    static final String ACCOUNT_SID = "AC9a944ee37dbe214bcff11881d473cee3";
+    static final String AUTH_TOKEN = "532bd41a586858ce9935c0efbff0e0ca";
+
+    public static void sendOTP(String phone, String otp) {
         Twilio.init(ACCOUNT_SID, AUTH_TOKEN);
         Message message = Message.creator(
             new com.twilio.type.PhoneNumber("+91"+phone),
-            new com.twilio.type.PhoneNumber("+12055491987"),
-            "Hello and welcome to TDF. Your otp for verification is:"+otp
-        ).create();
+                new com.twilio.type.PhoneNumber("+14432054383"),
+                "Welcome to TDF! OTP: "+otp)
+            .create();
 
         System.out.println(message.getBody());
-        System.out.println("OTP has been sent.");
-        
     }
 }

@@ -1,19 +1,19 @@
 package models;
 
+import javax.servlet.ServletContext;
+
 public class Wishlist {
-    // ################ Properties #################
+    public static ServletContext appContext;
+    public static String conURL;
+
     private Integer wishlistId;
     private Post post;
     private User user;
     private Status status;
-    
-    // ################ Constructors #################
-    public Wishlist(){
 
+    public Wishlist() {
     }
-    // ################ Other Methods #################
-    
-    // ################ Getters-Setters #################
+
     public Integer getWishlistId() {
         return wishlistId;
     }
@@ -46,5 +46,4 @@ public class Wishlist {
         this.status = status;
     }
 
-    
 }

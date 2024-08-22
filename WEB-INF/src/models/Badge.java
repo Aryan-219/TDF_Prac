@@ -1,53 +1,66 @@
 package models;
 
-import java.sql.DriverManager;
-import java.sql.PreparedStatement;
-import java.sql.Connection;
-import java.sql.ResultSet;
-import java.sql.SQLException;
 import java.util.ArrayList;
 
+import javax.servlet.ServletContext;
+
+import java.sql.*;
+
 public class Badge {
-    // ###############################Properties ######################
+
+    public static ServletContext appContext;
+    public static String conURL;
+
+    // ############### Properties #############
     private Integer badgeId;
     private String name;
 
-    // ############################### Constructors ######################
+    // ############### Constants #############
+    public static final Badge SILVER = new Badge(1, "Silver");
+    public static final Badge GOLD = new Badge(2, "Gold");
+    public static final Badge PLATINUM = new Badge(3, "Platinum");
+
+    // ############### Constructors #############
     public Badge() {
-        
+
     }
-    
+
+    public Badge(Integer badgeId) {
+        this.badgeId = badgeId;
+    }
+
     public Badge(Integer badgeId, String name) {
         this.badgeId = badgeId;
         this.name = name;
     }
 
-    // ############################### Other Methods ######################
-    public static ArrayList<Badge> collectAllBadges(){
+    // ############### Other Methods #############
+    public static ArrayList<Badge> collectAllBadges() {
         ArrayList<Badge> badges = new ArrayList<>();
 
         try {
             Class.forName("com.mysql.cj.jdbc.Driver");
-            Connection con = DriverManager.getConnection("jdbc:mysql://localhost:3306/mytdf?user=root&password=1234");
+            Connection con = DriverManager.getConnection(conURL);
 
             String query = "select * from badges";
 
             PreparedStatement ps = con.prepareStatement(query);
 
-            ResultSet rs =  ps.executeQuery();
+            ResultSet rs = ps.executeQuery();
 
             while (rs.next()) {
-                badges.add(new Badge(rs.getInt(1),rs.getString(2)));
+                badges.add(new Badge(rs.getInt(1), rs.getString(2)));
             }
-            
+
             con.close();
-        } catch (ClassNotFoundException|SQLException e) {
-            e.printStackTrace();        
+        } catch (SQLException | ClassNotFoundException e) {
+            e.printStackTrace();
         }
+
         return badges;
     }
 
-    // #####################Getters-Setters ########################
+    // ############### Getter-Setters #############
     public Integer getBadgeId() {
         return badgeId;
     }
@@ -59,7 +72,9 @@ public class Badge {
     public String getName() {
         return name;
     }
+
     public void setName(String name) {
         this.name = name;
     }
+
 }

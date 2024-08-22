@@ -12,42 +12,57 @@ import javax.mail.Message;
 
 public class EmailSender {
     static Properties props = new Properties();
-
-    static {
-        props.put("mail.transport.protocol","smtp");
-        props.put("mail.smtp.host","smtp-mail.outlook.com");
-        props.put("mail.smtp.port","587");
-        props.put("mail.smtp.auth","true");
-        props.put("mail.smtp.starttls.enable","true");
-    }
     
-    public static void  sendEmail(String toEmail, String subject, String body){
-        Session session = Session.getInstance(props,new EmailAuthenticator());    
+    static {
+        props.put("mail.transport.protocol", "smtp");
+        props.put("mail.smtp.host", "smtp-mail.outlook.com");
+        props.put("mail.smtp.port", "587");
+        props.put("mail.smtp.auth", "true");
+        props.put("mail.smtp.starttls.enable", "true");
+    }
+
+    public static void sendEmail(String toEmail, String subject, String message) {
+
+        Session session = Session.getInstance(props, new EmailAuthenticator());
+
         MimeMessage mm = new MimeMessage(session);
 
         try {
             mm.setFrom(AppUtility.fromEmail);
-            mm.setRecipients(Message.RecipientType.TO,toEmail);
-            System.out.println(AppUtility.fromEmail);
-            System.out.println(toEmail);
+            mm.setRecipients(Message.RecipientType.TO, toEmail);
             mm.setSubject(subject);
-            mm.setContent(body,"text/html");
+            // mm.setText("");
+            mm.setContent(message, "text/html");
+
             Transport.send(mm);
-        } catch (MessagingException e) {
+        } catch(MessagingException e) {
             e.printStackTrace();
         }
-        System.out.println("Email has been sent successfully");
+        System.out.println("Email sent successfully :)");
+    } 
+    
+    public static void sendResetPasswordMail(String email) {
+        String resetPasswordEmail 
+            = "<h1>Welcome to TDF</h1>"+
+            "<br><br><h2>Click over the reset password link</h2>"+
+            "<br><br><a href='http://localhost:8080/TDF_Prac/reset_password.do?email="+email+"'>The Reset Password Link</a>";
+        
+        sendEmail(email, "Reset Password Link", resetPasswordEmail);
     }
 
-    public static void sendAccVerificationEmail(String email,String otp){
-        String verificationEmail = "<h1>Welcome to TDF</h1> <br>"+ 
-        "<h3>Please click over the link to verify your email</h3> <br>"+
-        "<a href='http://localhost:8080/TDF_Prac/evf.do?email=" +  email + "&vcode=" + otp +"'>Email Verification Link</a>";
-        sendEmail(email,"Account Verification Email", verificationEmail);
+    public static void sendAccVerificationMail(String email, String vCode) {
+        String verificationEmail 
+            = "<h1>Welcome to TDF</h1>"+
+            "<br><br><h2>Click over the email verification link</h2>"+
+            "<br><br><a href='http://localhost:8080/TDF_Prac/evf.do?email="+email+"&vcode="+vCode+"'>The Verification Link</a>";
+        
+        sendEmail(email, "Email Verification Link", verificationEmail);
     }
 }
-class EmailAuthenticator extends Authenticator{
-    public PasswordAuthentication getPasswordAuthentication(){
+
+
+class EmailAuthenticator extends Authenticator {    
+    public PasswordAuthentication getPasswordAuthentication() {
         return new PasswordAuthentication(AppUtility.fromEmail, AppUtility.fromEmailPassword);
-    } 
+    }
 }

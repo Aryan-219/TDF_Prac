@@ -1,33 +1,40 @@
 package models;
 
+import javax.servlet.ServletContext;
+
 public class Reply {
-    
-    // ################# Properties ################### 
+    public static ServletContext appContext;
+    public static String conURL;
+
     private Integer replyId;
     private Question question;
     private Post post;
-    
-    // ################# Constructors ################### 
 
-    // ################# Other Methods ################### 
+    public Reply() {
+    }
 
-    // ################# Getters-Setters ################### 
-    public Integer getReplyId(){
+    public Integer getReplyId() {
         return replyId;
     }
-    public void setReplyId(Integer replyId){
+
+    public void setReplyId(Integer replyId) {
         this.replyId = replyId;
     }
-    public Question getQuestion(){
+
+    public Question getQuestion() {
         return question;
     }
-    public void setQuestion(Question question){
+
+    public void setQuestion(Question question) {
         this.question = question;
     }
-    public Post gePost(){
+
+    public Post getPost() {
         return post;
     }
-    public void setPost(Post post){
+
+    public void setPost(Post post) {
         this.post = post;
     }
+
 }

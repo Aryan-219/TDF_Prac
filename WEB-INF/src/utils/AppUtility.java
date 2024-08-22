@@ -9,20 +9,16 @@ import javax.servlet.ServletContext;
 
 public class AppUtility {
     public static ServletContext appContext;
-
-    public static String fromEmail;
-    public static String fromEmailPassword;
+    
+    static public String fromEmail;
+    static public String fromEmailPassword;
 
     public static String generateOTP() {
-        return Integer.toString(new Random().nextInt(8889) + 1111);
+        return Integer.toString(new Random().nextInt(888889) + 111111);
     }
 
-    // public static String generateOTP() {
-    //     return Integer.toString(new Random().nextInt(888889) + 111111);
-    // }
-    public static boolean checkGoogleRecaptchaResponse(String recaptchaURL, String secretKey, String responseToken)
-            throws IOException {
-        String url = recaptchaURL + "?secret=" + secretKey + "&response=" + responseToken;
+    public static boolean checkGoogleRecaptchaResponse(String recaptchaURL, String secretKey, String responseToken) throws IOException {
+        String url = recaptchaURL+"?secret="+secretKey+"&response="+responseToken;
         InputStream is = ThirdPartyServer.sendThirdPartyRequest(url);
 
         return Json.createReader(is).readObject().getBoolean("success");

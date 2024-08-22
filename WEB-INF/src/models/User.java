@@ -1,12 +1,18 @@
 package models;
 
 import java.sql.*;
+
+import javax.servlet.ServletContext;
+
 import org.jasypt.util.password.StrongPasswordEncryptor;
 
 public class User {
     static StrongPasswordEncryptor spe = new StrongPasswordEncryptor();
 
     // ########### Properties #################
+    public static ServletContext appContext;
+    public static String conURL;
+
     private Integer userId;
     private String name;
     private String email;
@@ -27,18 +33,11 @@ public class User {
     private Integer starRank;
     private Badge badge;
     private Status status;
+    private UserType userType;
 
     // ########### Constructors ###############
     public User() {
 
-    }
-
-    public User(String name, String email, String password, String phone, Country country) {
-        this.name = name;
-        this.email = email;
-        this.password = password;
-        this.phone = phone;
-        this.country = country;
     }
 
     public User(String name, String email, String password, String phone, Country country, String otp) {
@@ -50,75 +49,217 @@ public class User {
         this.otp = otp;
     }
 
+    public User(String email, String password) {
+        this.email = email;
+        this.password = password;
+    }
+
+    public User(Integer userId, String name) {
+        this.userId = userId;
+        this.name = name;
+    }
+
     // ########### Other Methods ##############
-    public static boolean checkPhoneExists(String phone) {
-        boolean flag = false;
+    public void saveInterest(String interest) {
         try {
             Class.forName("com.mysql.cj.jdbc.Driver");
-            Connection con = DriverManager.getConnection("jdbc:mysql://localhost:3306/mytdf?user=root&password=1234");
-            String query = "select user_id from users where phone=?";
-            PreparedStatement ps = con.prepareStatement(query);
-            ps.setString(1, phone);
-            ResultSet rs = ps.executeQuery();
+            Connection con = DriverManager.getConnection(conURL);
 
-            while (rs.next()) {
-                flag = true;
-            }
+            String query = "update users set interest=? where user_id=?";
+            PreparedStatement ps = con.prepareStatement(query);
+
+            ps.setString(1, interest);
+            ps.setInt(2, userId);
+
+            int val = ps.executeUpdate();
+
+            if (val == 1)
+                this.interest = interest;
+
             con.close();
         } catch (SQLException | ClassNotFoundException e) {
             e.printStackTrace();
         }
+    }
+
+    public void savePic(String fileName) {
+        try {
+            Class.forName("com.mysql.cj.jdbc.Driver");
+            Connection con = DriverManager.getConnection(conURL);
+
+            String query = "update users set pic=? where user_id=?";
+            PreparedStatement ps = con.prepareStatement(query);
+
+            ps.setString(1, email + "/" + fileName);
+            ps.setInt(2, userId);
+
+            int val = ps.executeUpdate();
+
+            if (val == 1) {
+                this.pic = email + "/" + fileName;
+                System.out.println("+++++++++ $$$ ++++++++++");
+            }
+
+            con.close();
+        } catch (SQLException | ClassNotFoundException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public static void updatePassword(String email, String password) {
+        try {
+            Class.forName("com.mysql.cj.jdbc.Driver");
+            Connection con = DriverManager.getConnection(conURL);
+
+            String query = "update users set password=? where email=?";
+            PreparedStatement ps = con.prepareStatement(query);
+
+            ps.setString(1, spe.encryptPassword(password));
+            ps.setString(2, email);
+
+            ps.executeUpdate();
+
+            con.close();
+        } catch (SQLException | ClassNotFoundException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public int signinUser() {
+        int statusId = 0;
+        // statusId:
+        // 0 - ac with email does not exist...
+        // -1 - password mismatched...
+        // 1 - active
+        // 2,4,5 - inactive,closed & blocked
+
+        try {
+            Class.forName("com.mysql.cj.jdbc.Driver");
+            Connection con = DriverManager.getConnection(conURL);
+
+            String query = "select user_id,u.name,password,pic,phone,interest,employer,experience,"
+                    + "job_profile,occupation_id,technologies_used,questions_posted,responses,c.country_id,c.name,"
+                    + "messages_blocked,star_rank,badge_id,s.status_id,s.name,user_type_id from users as u inner join countries as c "
+                    + "inner join status as s where email=? and u.country_id=c.country_id and u.status_id=s.status_id";
+            PreparedStatement ps = con.prepareStatement(query);
+            ps.setString(1, email);
+            ResultSet rs = ps.executeQuery();
+
+            if (rs.next()) {
+                statusId = rs.getInt("status_id");
+
+                if (statusId == 1) {
+                    if (spe.checkPassword(password, rs.getString("password"))) {
+                        password = null;
+                        userId = rs.getInt("user_id");
+                        name = rs.getString("name");
+                        pic = rs.getString("pic");
+                        phone = rs.getString("phone");
+                        interest = rs.getString("interest");
+                        employer = rs.getString("employer");
+                        experience = rs.getInt("experience");
+                        jobProfile = rs.getString("job_profile");
+                        occupation = new Occupation(rs.getInt("occupation_id"));
+                        technologiesUsed = rs.getString("technologies_used");
+                        questionsPosted = rs.getInt("questions_posted");
+                        responses = rs.getInt("responses");
+                        country = new Country(rs.getInt("country_id"), rs.getString(15));
+                        messagesBlocked = rs.getInt("messages_blocked");
+                        starRank = rs.getInt("star_rank");
+                        badge = new Badge(rs.getInt("badge_id"));
+                        status = new Status(rs.getInt(19), rs.getString(20));
+                        userType = new UserType(rs.getInt(21));
+                    } else {
+                        statusId = -1;
+                    }
+                }
+            }
+
+            con.close();
+        } catch (SQLException | ClassNotFoundException e) {
+            e.printStackTrace();
+        }
+
+        return statusId;
+    }
+
+    public static boolean checkPhoneExists(String phone) {
+        boolean flag = false;
+
+        try {
+            Class.forName("com.mysql.cj.jdbc.Driver");
+            Connection con = DriverManager.getConnection(conURL);
+
+            String query = "select user_id from users where phone=?";
+
+            PreparedStatement ps = con.prepareStatement(query);
+            ps.setString(1, phone);
+
+            ResultSet rs = ps.executeQuery();
+
+            if (rs.next()) {
+                flag = true;
+            }
+
+            con.close();
+        } catch (SQLException | ClassNotFoundException e) {
+            e.printStackTrace();
+        }
+
         return flag;
     }
 
     public static boolean checkEmailExists(String email) {
         boolean flag = false;
+
         try {
             Class.forName("com.mysql.cj.jdbc.Driver");
-            Connection con = DriverManager.getConnection("jdbc:mysql://localhost:3306/mytdf?user=root&password=1234");
-            String query = "select  user_id from users where email=?";
+            Connection con = DriverManager.getConnection(conURL);
+
+            String query = "select user_id from users where email=?";
+
             PreparedStatement ps = con.prepareStatement(query);
             ps.setString(1, email);
+
             ResultSet rs = ps.executeQuery();
+
             if (rs.next()) {
-                System.out.println("Duplicate entry found");
                 flag = true;
             }
+
             con.close();
-        } catch (ClassNotFoundException | SQLException e) {
+        } catch (SQLException | ClassNotFoundException e) {
             e.printStackTrace();
         }
+
         return flag;
     }
 
-    public static int verifyEmail(String email, String otp) {
-        int x = -1;
+    public static boolean verifyEmail(String email, String vcode) {
+        boolean flag = false;
+
         try {
             Class.forName("com.mysql.cj.jdbc.Driver");
-            Connection con = DriverManager.getConnection("jdbc:mysql://localhost:3306/mytdf?user=root&password=1234");
+            Connection con = DriverManager.getConnection(conURL);
 
-            String query = "update users set status_id=1,otp='' where email=? and otp=? and status_id!=1";
+            String query = "update users set status_id=1,otp='' where email=? and otp=?";
 
             PreparedStatement ps = con.prepareStatement(query);
             ps.setString(1, email);
-            ps.setString(2, otp);
+            ps.setString(2, vcode);
 
             int res = ps.executeUpdate();
-            System.out.println("Result of the update query" + res);
+
             if (res == 1) {
-                System.out.println("email verification successful");
-                System.out.println("Updating flag value to true");
-                x = 1;
-            }else{
-                x = 0;
-                System.out.println("You are already verified");
+                flag = true;
             }
-            
+
             con.close();
-        } catch (ClassNotFoundException | SQLException e) {
+        } catch (SQLException | ClassNotFoundException e) {
             e.printStackTrace();
         }
-        return x;
+
+        return flag;
     }
 
     public boolean signupUser() {
@@ -126,9 +267,9 @@ public class User {
 
         try {
             Class.forName("com.mysql.cj.jdbc.Driver");
-            Connection con = DriverManager.getConnection("jdbc:mysql://localhost:3306/mytdf?user=root&password=1234");
+            Connection con = DriverManager.getConnection(conURL);
 
-            String query = "insert into users (name, email, password, phone, country_id,otp) value (?,?,?,?,?,?)";
+            String query = "insert into users (name, email, password, phone, country_id, otp) value (?,?,?,?,?,?)";
             PreparedStatement ps = con.prepareStatement(query);
 
             ps.setString(1, name);
@@ -137,6 +278,7 @@ public class User {
             ps.setString(4, phone);
             ps.setInt(5, country.getCountryId());
             ps.setString(6, otp);
+
             int res = ps.executeUpdate();
 
             if (res == 1)
@@ -309,6 +451,14 @@ public class User {
 
     public void setStatus(Status status) {
         this.status = status;
+    }
+
+    public UserType getUserType() {
+        return userType;
+    }
+
+    public void setUserType(UserType userType) {
+        this.userType = userType;
     }
 
 }

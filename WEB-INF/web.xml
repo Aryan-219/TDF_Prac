@@ -38,21 +38,46 @@
 
   <context-param>
     <param-name>secret_key</param-name>
-    <param-value>6Lc5sSopAAAAADSOg86k2HYwcmBdiOeoKHygJe3S</param-value>
+    <param-value>6LeDNhUpAAAAAA9X5grkPlDRhAurNgwmy_1S-UNp</param-value>
   </context-param>
 
   <context-param>
     <param-name>from_email</param-name>
-    <param-value>aryanagrawal2002@outlook.com</param-value>
+    <param-value>agrawalmukesh22@outlook.com</param-value>
   </context-param>
-  
+
   <context-param>
     <param-name>from_email_password</param-name>
-    <param-value>Aryan@21</param-value>
+    <param-value>Mukesh@22</param-value>
   </context-param>
 
   <listener>
     <listener-class>listeners.AppListenerImpl</listener-class>
   </listener>
+
+  <context-param>
+    <param-name>host</param-name>
+    <param-value>localhost</param-value>
+  </context-param>
   
+  <context-param>
+    <param-name>port</param-name>
+    <param-value>3306</param-value>
+  </context-param>
+
+  <context-param>
+    <param-name>dbName</param-name>
+    <param-value>mytdf</param-value>
+  </context-param>
+  
+  <context-param>
+    <param-name>unmSql</param-name>
+    <param-value>root</param-value>
+  </context-param>
+
+  <context-param>
+    <param-name>pwdSql</param-name>
+    <param-value>1234</param-value>
+  </context-param>
+
 </web-app>

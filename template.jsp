@@ -6,6 +6,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>:: TDF Home ::</title>
+    
+    <link rel="icon" href="static/images/tdf_logo.ico">
 
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/css/bootstrap.min.css">
 </head>
@@ -18,6 +20,7 @@
         <div class="row">
             <div class="col-1"></div>
             <div class="col-10">
+                <h3 class="my-3 py-3 bg-light text-primary ps-3 rounded-2">All Questions</h3>
 
             </div>
             <div class="col-1"></div>

@@ -2,22 +2,21 @@ package models;
 
 import java.sql.Timestamp;
 
-public class Message {
+import javax.servlet.ServletContext;
 
-    // ################# Properties ##################
+public class Message {
+    public static ServletContext appContext;
+    public static String conURL;
+
     private Integer messageId;
     private User fromUser;
     private User toUser;
     private String message;
     private Timestamp postedOn;
 
-    // ################# Constructors ##################
     public Message() {
     }
 
-    // ################# Other Methods ##################
-
-    // ################# Getters-Setters ##################
     public Integer getMessageId() {
         return messageId;
     }

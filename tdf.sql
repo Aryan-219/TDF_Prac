@@ -49,6 +49,9 @@ create table occupations
 insert into occupations 
 (name) values 
 ('Student'), ('Working Professional'), ('Startup Owner'), ('Freelancer');
+insert into occupations
+(name) VALUE ('Trainer');
+
 
 ###################### occupations end #############################
 
@@ -130,8 +133,22 @@ create table users
 
 
 
+########################### - user_types start ##################
+create table user_types 
+(
+    user_type_id int auto_increment primary key,
+    name char(15) not null unique
+);
 
-################## moderators start ##################
+insert into user_types (name) values ('Admin'), ('Moderator'), ('General User');
+
+########################### - user_types end ##################
+
+alter table users add column user_type_id int not null default 3, add constraint fk_users_utypes foreign key (user_type_id) references user_types (user_type_id);
+
+
+
+################## moderators start ################## 
 create table moderators 
 (
     moderator_id int auto_increment primary key,
@@ -165,6 +182,9 @@ create table posts
     constraint fk_posts_users foreign key (user_id) references users (user_id),
     constraint fk_posts_status foreign key (status_id) references status (status_id)
 );
+
+
+alter table posts change column status_id status_id int not null default 3;
 
 ################## posts end ####################
 

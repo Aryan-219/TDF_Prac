@@ -1,32 +1,34 @@
 package controllers;
 
-import java.io.IOException;
-
-import javax.servlet.ServletException;
-import javax.servlet.annotation.WebServlet;
-import javax.servlet.http.HttpServlet;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import javax.servlet.http.HttpSession;
+import javax.servlet.*;
+import javax.servlet.http.*;
 
 import utils.AppUtility;
 import utils.SMSSender;
 
+import javax.servlet.annotation.*;
+import java.io.*;
+
 @WebServlet("/generate_otp.do")
-public class GenerateOTPServlet extends HttpServlet{
-    public void doGet(HttpServletRequest request, HttpServletResponse response)throws IOException, ServletException{
+public class GenerateOTPServlet extends HttpServlet {
+    public void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException {
+        //get session
         HttpSession session = request.getSession();
+        
+        //get parameter
+        String phone = request.getParameter("phone");
 
-        String phone  = request.getParameter("phone");
-
+        //generate otp
         String otp = AppUtility.generateOTP();
         
-        SMSSender.sendSMS(phone,otp);
+        //sendOTP
+        // SMSSender.sendOTP(phone, otp);
 
-        session.setAttribute("otp", otp);
+        //save otp in session
+        // session.setAttribute("otp", otp);
         session.setAttribute("otp", "444444");
 
+        //send boolean response
         response.getWriter().print(true);
-        
     }
 }

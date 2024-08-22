@@ -13,7 +13,7 @@ import models.Topic;
 
 @WebServlet("/index.do")
 public class IndexServlet extends HttpServlet {
-    public void doGet(HttpServletRequest request, HttpServletResponse response)throws IOException, ServletException{
+    public void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException {
         ArrayList<Topic> topics = Topic.collectAllTopics();
 
         request.setAttribute("topics", topics);

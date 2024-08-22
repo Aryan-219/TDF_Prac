@@ -1,0 +1,8 @@
+{
+    "java.project.referencedLibraries": [
+        "lib/**/*.jar",
+        "c:\\Tomcat 9.0\\lib\\servlet-api.jar",
+        "c:\\Tomcat 9.0\\lib\\commons-fileupload-1.5.jar",
+        "c:\\Tomcat 9.0\\lib\\jasypt-1.9.3.jar"
+    ]
+}
